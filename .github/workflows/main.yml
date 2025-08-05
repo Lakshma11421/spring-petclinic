@@ -25,7 +25,7 @@ jobs:
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin my-docker-repo
     - name: Push docker image
       run: |
-        docker push my-docker-repo/my-app:${{ githubsha }}
+        docker push my-docker-repo/my-app:${{ github.sha }}
     - name: upload to nexus
       env:
         NEXUS_USER: ${{ secrets.NEXUS_USERNAME }}
@@ -36,7 +36,7 @@ jobs:
         -DartifactId=my-app \
         -Dversion=${{ github.ha }} \
         -Dpackaging=jar \
-        -Dfile=target/my-app-${{ github-sha }}.jar \
+        -Dfile=target/my-app-${{ github.sha }}.jar \
         -DrepositoryId=nexu-repo \
         -Durl=http://nexus.your-domain.com/repository/maven-releas/
     - name: Deploy to kubernets
@@ -44,5 +44,5 @@ jobs:
         KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
       run: |
         echo $KUBE_CONFIG_DATA | base64 --decode > ~/.kube/config
-        kubectl set image deployment/my-app my-app=my-docker-repo/my-app:${{ hithub.sha }} --record
+        kubectl set image deployment/my-app my-app=my-docker-repo/my-app:${{ github.sha }} --record
     
